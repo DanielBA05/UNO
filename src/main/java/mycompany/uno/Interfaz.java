@@ -310,6 +310,7 @@ public class Interfaz extends JFrame {
                         }
                         
                         haJugadoCartaEsteTurno = true;
+                        haRobadoCartaEsteTurno = true;
                         refresh();
                     } else if (haJugadoCartaEsteTurno) {
                         JOptionPane.showMessageDialog(panel,
