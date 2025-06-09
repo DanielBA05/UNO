@@ -20,7 +20,7 @@ public class RegistroJugadores extends JFrame {
 
     public RegistroJugadores() {
         setTitle("Registro de Jugadores");
-        setSize(420, 360);
+        setSize(600, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
