@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
  *
  * @author jos23
  */
-
 public class Interfaz extends JFrame {
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 200;
@@ -29,7 +28,9 @@ public class Interfaz extends JFrame {
     private JLabel lblDireccion;
     private JButton btnTerminar;
     private ColorSelector colorSelector;
-
+    private boolean haRobadoCartaEsteTurno = false;
+    private boolean haJugadoCartaEsteTurno = false;
+    
     public Interfaz(List<String> nombresJugadores) {
         List<Jugador> jugadores = new ArrayList<>();
         for (String nombre : nombresJugadores) {
@@ -66,9 +67,17 @@ public class Interfaz extends JFrame {
         lblMonton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                juego.getJugadorActual().robarCarta(juego.getMonton(), 1);
-                refresh();
-                verificarFinTurnoAutomatico();
+                if (!haRobadoCartaEsteTurno) {
+                    juego.getJugadorActual().robarCarta(juego.getMonton(), 1);
+                    haRobadoCartaEsteTurno = true;
+                    refresh();
+                    verificarFinTurnoAutomatico();
+                } else {
+                    JOptionPane.showMessageDialog(Interfaz.this, 
+                        "¡Sólo puedes robar una carta por turno!", 
+                        "Aviso", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
         panelMesa.add(lblMonton);
@@ -101,6 +110,9 @@ public class Interfaz extends JFrame {
         btnTerminar.setFont(new Font("Arial", Font.BOLD, 14));
         btnTerminar.addActionListener(e -> {
             juego.siguienteTurno();
+            haRobadoCartaEsteTurno = false;
+            haJugadoCartaEsteTurno = false;
+            juego.getJugadorActual().robarCarta(juego.getMonton(), 1);
             refresh();
         });
         controlesPanel.add(btnTerminar);
@@ -189,7 +201,6 @@ public class Interfaz extends JFrame {
 
         lblTurno.setText("Turno de: " + juego.getJugadorActual().getNombre());
         lblDireccion.setText("Dirección: " + (juego.isDireccionNormal() ? "Normal" : "Reversa"));
-        
 
         if (juego.getJugadorActual().getMano().isEmpty()) {
             String winnerName = juego.getJugadorActual().getNombre();
@@ -218,6 +229,8 @@ public class Interfaz extends JFrame {
         if (!puedeJugar) {
             JOptionPane.showMessageDialog(this, "No puedes jugar ninguna carta. Turno terminado automáticamente.");
             juego.siguienteTurno();
+            haRobadoCartaEsteTurno = false;
+            haJugadoCartaEsteTurno = false;
             refresh();
         }
     }
@@ -283,31 +296,28 @@ public class Interfaz extends JFrame {
             panel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                       if (juego.puedeJugarCarta(juego.getJugadorActual(), carta)) {
-        if (carta.esComodin()) {
-      
-            int colorElegido = colorSelector.mostrar(); 
-       
-            carta.setColor(colorElegido);
-       
-            refresh();
-        }
-        
-        
-        juego.getJugadorActual().jugarCarta(carta, juego);
-        juego.agregarCartaDescarte(carta);
-        
-        if (carta.esEfecto()) {
-            juego.aplicarEfectoCarta(carta);
-        } else {
-           
-            juego.siguienteTurno();
-        }
-        
-        refresh();
-        
-    }  else {
-                        JOptionPane.showMessageDialog(panel, 
+                    if (!haJugadoCartaEsteTurno && juego.puedeJugarCarta(juego.getJugadorActual(), carta)) {
+                        if (carta.esComodin()) {
+                            int colorElegido = colorSelector.mostrar();
+                            carta.setColor(colorElegido);
+                        }
+                        
+                        juego.getJugadorActual().jugarCarta(carta, juego);
+                        juego.agregarCartaDescarte(carta);
+                        
+                        if (carta.esEfecto()) {
+                            juego.aplicarEfectoCarta(carta);
+                        }
+                        
+                        haJugadoCartaEsteTurno = true;
+                        refresh();
+                    } else if (haJugadoCartaEsteTurno) {
+                        JOptionPane.showMessageDialog(panel,
+                            "¡Ya jugaste una carta este turno!",
+                            "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(panel,
                             "No puedes jugar esta carta ahora.\n" +
                             "Debe coincidir en color o número con la carta superior\n" +
                             "o ser un comodín.",
@@ -389,10 +399,10 @@ public class Interfaz extends JFrame {
             dialog.add(btnAmarillo);
         }
 
-       public int mostrar() {
-    dialog.setVisible(true); 
-    return selectedColor; 
-}
+        public int mostrar() {
+            dialog.setVisible(true);
+            return selectedColor;
+        }
     }
 
     public static void main(String[] args) {
