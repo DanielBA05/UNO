@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mycompany.uno;
 import javax.swing.*;
 import java.awt.*;
@@ -10,10 +6,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 
-/**
- *
- * @author jos23
- */
 public class Interfaz extends JFrame {
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 200;
@@ -112,7 +104,6 @@ public class Interfaz extends JFrame {
             juego.siguienteTurno();
             haRobadoCartaEsteTurno = false;
             haJugadoCartaEsteTurno = false;
-            juego.getJugadorActual().robarCarta(juego.getMonton(), 1);
             refresh();
         });
         controlesPanel.add(btnTerminar);
